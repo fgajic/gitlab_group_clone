@@ -1,5 +1,5 @@
-from gitlab import Gitlab as gl
-from git import Git as git
+from gitlab import Gitlab
+from git import Git
 from getpass import getpass as gp
 from pathlib import Path
 from os import mkdir
@@ -21,6 +21,8 @@ def directory_creation(path):
                        "Valid options: y or yes: ")
         if choice.lower() == "y" or "yes":
             directory_creation(path_info())
+        else:
+            path_info()
     return path
 
 
@@ -32,14 +34,14 @@ def main():
     repos_directory = directory_creation(path_info())
 
     # Connecting to GitLab Host and getting list of all repositories from provided group
-    gl_connect = gl(gl_host, private_token=gl_access_token)
+    gl_connect = Gitlab(gl_host, private_token=gl_access_token)
     gl_group = gl_connect.groups.get(gl_group_id)
     projects_group = gl_group.projects.list(iterator=True)
 
     project_counter = 1
     for project in projects_group:
         print(f"[{project_counter}] - cloning {project.name}")
-        git(repos_directory).clone(project.ssh_url_to_repo)
+        Git(repos_directory).clone(project.ssh_url_to_repo)
         project_counter += 1
 
     print(f"You've successfully cloned {project_counter - 1} project repositories")
